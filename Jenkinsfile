@@ -1,46 +1,10 @@
-pipeline {
-
-    agent any
-
-   
-
-    triggers {
-        pollSCM "* * * * *"
-    }
-
-    parameters {
-        booleanParam(name: "RELEASE",
-                description: "Build a release from current commit.",
-                defaultValue: false)
-    }
-
-    stages {
-
-        stage("Build & Deploy SNAPSHOT") {
-            steps {
-                ansiColor("xterm") {
-                    sh "mvn -B deploy"
-                }
+pipeline { 
+    agent any  
+    stages { 
+        stage('Build') { 
+            steps { 
+               echo 'This is a minimal pipeline.' 
             }
-        }
-
-        stage("Release") {
-            when {
-                expression { params.RELEASE }
-            }
-            steps {
-                ansiColor("xterm") {
-                    sh "mvn -B release:prepare"
-                    sh "mvn -B release:perform"
-                }
-            }
-        }
-
-    }
-
-    post {
-        always {
-            deleteDir()
         }
     }
 }
