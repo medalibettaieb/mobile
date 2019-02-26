@@ -1,24 +1,48 @@
 pipeline {
+
     agent any
+
+    tools {
+        maven "Maven"
+    }
+
+    triggers {
+        pollSCM "* * * * *"
+    }
+
+    parameters {
+        booleanParam(name: "RELEASE",
+                description: "Build a release from current commit.",
+                defaultValue: false)
+    }
+
     stages {
-        stage('Example') {
+
+        stage("Build & Deploy SNAPSHOT") {
             steps {
-                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                ansiColor("xterm") {
+                    sh "mvn -B deploy"
+                }
             }
         }
-		
-		stage ('Initialize') {
-      steps {
-        sh '''
-          echo "PATH = ${PATH}"
-          echo "M2_HOME = ${M2_HOME}"
-        '''
-      }
+
+        stage("Release") {
+            when {
+                expression { params.RELEASE }
+            }
+            steps {
+                ansiColor("xterm") {
+                    sh "mvn -B release:prepare"
+                    sh "mvn -B release:perform"
+                }
+            }
+        }
+
     }
-    stage ('Build') {
-      steps {
-        sh 'mvn clean package'
-      }
-    }
+
+    post {
+        always {
+            deleteDir()
+        }
     }
 }
