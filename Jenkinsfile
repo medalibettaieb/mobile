@@ -7,7 +7,7 @@ pipeline {
                 sh '''
                     echo "PATH = ${PATH}"
                     echo "M2_HOME = ${M2_HOME}"
-					mvn -f demo/pom.xml install
+					mvn -f /demo/pom.xml install
                 ''' 
             }
         }
